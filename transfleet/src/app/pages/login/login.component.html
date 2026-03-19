@@ -127,10 +127,12 @@
           [class.loading]="isLoading()"
         >
           @if (isLoading()) {
-            <span class="spinner"></span>
-            Connexion en cours...
+            <span class="btn-content loading-content">
+              <span class="spinner"></span>
+              Connexion en cours...
+            </span>
           } @else {
-            Se connecter →
+            <span class="btn-content">Se connecter →</span>
           }
         </button>
       </form>
