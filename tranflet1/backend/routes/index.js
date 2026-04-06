@@ -11,6 +11,7 @@ const driver = require('../controllers/driver.controller');
 const fuel = require('../controllers/fuel.controller');
 const maintenance = require('../controllers/maintenance.controller');
 const report = require('../controllers/report.controller'); 
+const notification = require('../controllers/notification.controller'); 
 
 const any = [authenticate];
 
@@ -64,7 +65,12 @@ router.put('/maintenance/:id', ...any, maintenance.update);
 router.delete('/maintenance/:id', ...any, maintenance.remove);
 router.get('/maintenance/upcoming', ...any, maintenance.upcoming);
 
-// --- ÉVITER LES ERREURS 404 DANS LA CONSOLE ---
-router.get('/notifications', ...any, (req, res) => res.json({ data: [] }));
+// --- NOTIFICATIONS ---
+router.get('/notifications', ...any, notification.list);
+router.get('/notifications/unread-count', ...any, notification.unreadCount);
+router.post('/notifications', ...any, notification.create);
+router.put('/notifications/:id/read', ...any, notification.markRead);
+router.put('/notifications/mark-all-read', ...any, notification.markAllRead);
+router.delete('/notifications/:id', ...any, notification.remove);
 
 module.exports = router;

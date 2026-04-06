@@ -132,17 +132,20 @@ export class ApiService {
   }
 
   // ── Notifications ───────────────────────────────────────────────────────────
-  getNotifications(q: Record<string, any> = {}): Observable<PagedResponse<Notification> & { unread: number }> {
-    return this.http.get<any>(`${this.base}/notifications`, { params: this.params(q) });
+  getNotifications(q: Record<string, any> = {}): Observable<PagedResponse<Notification>> {
+    return this.http.get<PagedResponse<Notification>>(`${this.base}/notifications`, { params: this.params(q) });
+  }
+  getUnreadCount(): Observable<{ unread_count: number }> {
+    return this.http.get<{ unread_count: number }>(`${this.base}/notifications/unread-count`);
   }
   createNotification(data: Partial<Notification>): Observable<Notification> {
     return this.http.post<Notification>(`${this.base}/notifications`, data);
   }
   markRead(id: number): Observable<any> {
-    return this.http.patch(`${this.base}/notifications/${id}/read`, {});
+    return this.http.put(`${this.base}/notifications/${id}/read`, {});
   }
   markAllRead(): Observable<any> {
-    return this.http.patch(`${this.base}/notifications/read-all`, {});
+    return this.http.put(`${this.base}/notifications/mark-all-read`, {});
   }
   deleteNotification(id: number): Observable<void> {
     return this.http.delete<void>(`${this.base}/notifications/${id}`);

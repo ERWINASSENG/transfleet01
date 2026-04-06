@@ -1,5 +1,6 @@
 'use strict';
 const { Trip, Vehicle, Driver, User, TrackingPoint, Notification } = require('../models');
+const { notifyUser } = require('../utils/socket');
 
 // Positions de démo à Douala
 const demoPositions = [
@@ -36,6 +37,13 @@ exports.create = async (req, res, next) => {
         message: `Un trajet de ${req.body.from_location} vers ${req.body.to_location} a été planifié pour vous`,
         target_role: 'driver',
         action_url: `/trips`
+      });
+      
+      // Notification en temps réel via WebSocket
+      notifyUser(driver.user_id, 'new_trip', {
+        title: 'Nouveau trajet planifié',
+        message: `Un trajet de ${req.body.from_location} vers ${req.body.to_location} a été planifié pour vous`,
+        trip_id: trip.id
       });
     }
     
@@ -141,6 +149,13 @@ exports.accept = async (req, res, next) => {
       action_url: `/trips`
     });
     
+    // Notification en temps réel via WebSocket
+    notifyUser(trip.created_by, 'trip_accepted', {
+      title: 'Trajet accepté',
+      message: `${driverName} a accepté le trajet ${trip.from_location} → ${trip.to_location}`,
+      trip_id: trip.id
+    });
+    
     const updated = await Trip.findByPk(trip.id, { include: tripIncludes });
     res.json({ message: "Trajet accepté", trip: updated });
   } catch (error) { next(error); }
@@ -170,6 +185,14 @@ exports.decline = async (req, res, next) => {
       message: `${driverName} a refusé le trajet ${trip.from_location} → ${trip.to_location}. Raison: ${reason}`,
       target_role: 'manager',
       action_url: `/trips`
+    });
+    
+    // Notification en temps réel via WebSocket
+    notifyUser(trip.created_by, 'trip_declined', {
+      title: 'Trajet refusé',
+      message: `${driverName} a refusé le trajet ${trip.from_location} → ${trip.to_location}. Raison: ${reason}`,
+      trip_id: trip.id,
+      reason: reason
     });
     
     const updated = await Trip.findByPk(trip.id, { include: tripIncludes });

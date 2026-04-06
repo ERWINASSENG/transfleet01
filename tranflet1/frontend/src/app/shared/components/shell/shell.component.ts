@@ -51,8 +51,8 @@ export class ShellComponent implements OnInit {
   }
 
   private refreshUnread(): void {
-    this.api.getNotifications({ limit: 1 }).subscribe({
-      next: (r: any) => this.unreadCount.set(r.unread ?? 0),
+    this.api.getUnreadCount().subscribe({
+      next: (r) => this.unreadCount.set(r.unread_count ?? 0),
       error: () => {},
     });
   }
