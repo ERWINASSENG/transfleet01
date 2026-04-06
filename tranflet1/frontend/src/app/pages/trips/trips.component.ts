@@ -39,7 +39,16 @@ export class TripsComponent implements OnInit {
   save(): void {
     if (!this.form['vehicle_id'] || !this.form['driver_id'] || !this.form['from_location'] || !this.form['to_location']) { this.formError.set('Champs obligatoires manquants.'); return; }
     this.saving.set(true);
-    this.api.createTrip(this.form).subscribe({ next: () => { this.closeModal(); this.load(); this.saving.set(false); }, error: (e:any) => { this.formError.set(e?.error?.message || 'Erreur'); this.saving.set(false); } });
+    
+    const tripId = this.form['id'];
+    const operation = tripId 
+      ? this.api.updateTrip(tripId, this.form)
+      : this.api.createTrip(this.form);
+    
+    operation.subscribe({ 
+      next: () => { this.closeModal(); this.load(); this.saving.set(false); }, 
+      error: (e:any) => { this.formError.set(e?.error?.message || 'Erreur'); this.saving.set(false); } 
+    });
   }
   startTrip(t: Trip): void {
     if (confirm(`Démarrer le trajet ${t.from_location} → ${t.to_location} ?`)) {
@@ -55,6 +64,21 @@ export class TripsComponent implements OnInit {
     const reason = prompt("Raison de l'annulation (optionnel) :");
     if (reason !== null) this.api.cancelTrip(t.id, reason || undefined).subscribe({ next: () => this.load(), error: (e:any) => alert(e?.error?.message || 'Erreur') });
   }
+
+  editTrip(t: Trip): void {
+    this.form = { ...t, vehicle_id: t.vehicle_id, driver_id: t.driver_id };
+    this.formError.set('');
+    this.showModal.set(true);
+    this.api.getVehicles({ limit:100 }).subscribe(r => this.availVehicles.set(r.data));
+    this.api.getDrivers({ limit:100 }).subscribe(r => this.availDrivers.set(r.data));
+  }
+
+  deleteTrip(t: Trip): void {
+    if (confirm(`Supprimer le trajet ${t.from_location} → ${t.to_location} ?`)) {
+      this.api.deleteTrip(t.id).subscribe({ next: () => this.load(), error: (e:any) => alert(e?.error?.message || 'Erreur') });
+    }
+  }
+
   emptyForm() { return { vehicle_id:'', driver_id:'', from_location:'', to_location:'', estimated_distance: null, estimated_duration:'', purpose:'', passengers:0, scheduled_start:'', notes:'' }; }
   statusLabel(s: string): string { return ({planned:'Planifié',in_progress:'En cours',completed:'Terminé',cancelled:'Annulé'})[s as keyof object] ?? s; }
 }

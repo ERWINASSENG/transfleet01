@@ -81,6 +81,9 @@ export class ApiService {
   updateTrip(id: number, data: Partial<Trip>): Observable<Trip> {
     return this.http.put<Trip>(`${this.base}/trips/${id}`, data);
   }
+  deleteTrip(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/trips/${id}`);
+  }
   startTrip(id: number): Observable<Trip> {
     return this.http.post<Trip>(`${this.base}/trips/${id}/start`, {});
   }

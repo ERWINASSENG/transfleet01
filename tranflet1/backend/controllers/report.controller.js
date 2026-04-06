@@ -11,6 +11,9 @@ exports.dashboard = async (req, res, next) => {
     const Fuel = db.Fuel || db.fuels;
     const Maintenance = db.Maintenance || db.maintenances;
 
+    const { from_date, to_date } = req.query;
+    const dateFilter = {};
+
     if (from_date || to_date) {
       dateFilter.created_at = {};
       if (from_date) dateFilter.created_at[Op.gte] = new Date(from_date);
@@ -55,7 +58,12 @@ exports.dashboard = async (req, res, next) => {
     });
 
     const [fuelStats] = await Fuel.findAll({
-      where: dateFilter,
+      where: from_date || to_date ? {
+        date: {
+          ...(from_date && { [Op.gte]: from_date }),
+          ...(to_date && { [Op.lte]: to_date })
+        }
+      } : {},
       attributes: [
         [fn('SUM', col('quantity')), 'total_quantity'],
         [fn('SUM', col('total_cost')), 'total_cost'],
@@ -137,7 +145,15 @@ exports.vehicles = async (req, res, next) => {
 
     // Statistiques du carburant
     const [fuelStats] = await Fuel.findAll({
-      where: { vehicle_id: vehicleId, ...dateFilter },
+      where: { 
+        vehicle_id: vehicleId,
+        ...(from_date || to_date ? {
+          date: {
+            ...(from_date && { [Op.gte]: from_date }),
+            ...(to_date && { [Op.lte]: to_date })
+          }
+        } : {})
+      },
       attributes: [
         [fn('COUNT', col('id')), 'total_fillups'],
         [fn('SUM', col('quantity')), 'total_quantity'],

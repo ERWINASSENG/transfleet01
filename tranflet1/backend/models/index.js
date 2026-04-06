@@ -153,6 +153,7 @@ Fuel.belongsTo(Vehicle, { foreignKey: 'vehicle_id', as: 'vehicle' });
 Fuel.belongsTo(Driver,  { foreignKey: 'driver_id',  as: 'driver' });
 
 Maintenance.belongsTo(Vehicle, { foreignKey: 'vehicle_id', as: 'vehicle' });
+Maintenance.belongsTo(User,    { foreignKey: 'created_by', as: 'creator' });
 
 Notification.belongsTo(User, { foreignKey: 'sender_id',    as: 'sender' });
 Notification.belongsTo(User, { foreignKey: 'recipient_id', as: 'recipient' });

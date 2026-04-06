@@ -14,14 +14,14 @@ const tripIncludes = [
 
 exports.list = async (req, res, next) => {
   try {
-    const trips = await Trip.findAll({ include: tripIncludes, order: [['createdAt', 'DESC']] });
+    const trips = await Trip.findAll({ include: tripIncludes, order: [['created_at', 'DESC']] });
     res.json({ data: trips });
   } catch (error) { next(error); }
 };
 
 exports.create = async (req, res, next) => {
   try {
-    const trip = await Trip.create({ ...req.body, status: 'scheduled' });
+    const trip = await Trip.create({ ...req.body, status: 'planned' });
     res.status(201).json(trip);
   } catch (error) { next(error); }
 };
@@ -44,5 +44,55 @@ exports.start = async (req, res, next) => {
     });
 
     res.json({ message: "Trajet démarré avec succès" });
+  } catch (error) { next(error); }
+};
+
+exports.complete = async (req, res, next) => {
+  try {
+    const trip = await Trip.findByPk(req.params.id);
+    if (!trip) return res.status(404).json({ message: 'Non trouvé' });
+    
+    const { actual_distance, actual_duration, fuel_used, notes } = req.body;
+    await trip.update({
+      status: 'completed',
+      actual_end: new Date(),
+      actual_distance,
+      actual_duration,
+      fuel_used,
+      notes
+    });
+    
+    res.json({ message: "Trajet terminé avec succès" });
+  } catch (error) { next(error); }
+};
+
+exports.cancel = async (req, res, next) => {
+  try {
+    const trip = await Trip.findByPk(req.params.id);
+    if (!trip) return res.status(404).json({ message: 'Non trouvé' });
+    
+    await trip.update({ status: 'cancelled', notes: req.body.reason || trip.notes });
+    res.json({ message: "Trajet annulé avec succès" });
+  } catch (error) { next(error); }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const trip = await Trip.findByPk(req.params.id);
+    if (!trip) return res.status(404).json({ message: 'Non trouvé' });
+    
+    await trip.update(req.body);
+    const updated = await Trip.findByPk(trip.id, { include: tripIncludes });
+    res.json(updated);
+  } catch (error) { next(error); }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    const trip = await Trip.findByPk(req.params.id);
+    if (!trip) return res.status(404).json({ message: 'Non trouvé' });
+    
+    await trip.destroy();
+    res.status(204).send();
   } catch (error) { next(error); }
 };

@@ -28,6 +28,8 @@
               <td class="actions">
                 @if (isManager() && t.status === "planned") {
                   <button class="btn-icon-sm success" title="Démarrer" (click)="startTrip(t)">Demarrer</button>
+                  <button class="btn-icon-sm" title="Modifier" (click)="editTrip(t)">Modifier</button>
+                  <button class="btn-icon-sm danger" title="Supprimer" (click)="deleteTrip(t)">Supprimer</button>
                 }
                 @if (isManager() && t.status === "in_progress") {
                   <button class="btn-icon-sm success" title="Terminer" (click)="openComplete(t)">Terminer</button>
@@ -48,17 +50,17 @@
   @if (showModal()) {
     <div class="modal-backdrop" (click)="closeModal()">
       <div class="modal" (click)="$event.stopPropagation()">
-        <div class="modal-header"><h2>Nouveau trajet</h2><button class="modal-close" (click)="closeModal()">X</button></div>
+        <div class="modal-header"><h2>{{ form['id'] ? 'Modifier trajet' : 'Nouveau trajet' }}</h2><button class="modal-close" (click)="closeModal()">X</button></div>
         <div class="modal-body">
           @if (formError()) { <div class="alert-error">{{ formError() }}</div> }
           <div class="form-grid">
-            <div class="field"><label>Véhicule disponible *</label>
+            <div class="field"><label>Véhicule *</label>
               <select [(ngModel)]="form.vehicle_id">
                 <option value="">-- Sélectionner --</option>
                 @for (v of availVehicles(); track v.id) { <option [value]="v.id">{{ v.plate }} – {{ v.brand }} {{ v.model }}</option> }
               </select>
             </div>
-            <div class="field"><label>Conducteur disponible *</label>
+            <div class="field"><label>Conducteur *</label>
               <select [(ngModel)]="form.driver_id">
                 <option value="">-- Sélectionner --</option>
                 @for (d of availDrivers(); track d.id) { <option [value]="d.id">{{ d.user?.first_name }} {{ d.user?.last_name }}</option> }
@@ -76,7 +78,7 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" (click)="closeModal()">Annuler</button>
-          <button class="btn btn-primary" (click)="save()" [disabled]="saving()">{{ saving() ? "Enregistrement…" : "Planifier" }}</button>
+          <button class="btn btn-primary" (click)="save()" [disabled]="saving()">{{ saving() ? "Enregistrement…" : (form['id'] ? 'Modifier' : 'Planifier') }}</button>
         </div>
       </div>
     </div>

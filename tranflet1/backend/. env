@@ -1,7 +1,7 @@
 # ── Base de données ──────────────────────────────────────────────────────────
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_NAME=monitrack_db
+DB_NAME=transflet_db
 DB_USER=root
 DB_PASS=
 
