@@ -68,8 +68,10 @@ export class AuthService {
         // Mise à jour de l'état
         this._user.set(user);
 
-        // Redirection intelligente
-        if (user.role === 'driver') {
+        // Redirection : si mot de passe par défaut, forcer le changement
+        if (user.passwordIsDefault) {
+          this.router.navigate(['/force-password-change']);
+        } else if (user.role === 'driver') {
           this.router.navigate(['/trips']);
         } else {
           this.router.navigate(['/dashboard']);

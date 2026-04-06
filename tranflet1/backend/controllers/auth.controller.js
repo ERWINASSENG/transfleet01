@@ -40,7 +40,8 @@ exports.login = async (req, res, next) => {
         last_name: user.last_name,
         email: user.email,
         role: user.role,
-        driver_id: driver?.id || null
+        driver_id: driver?.id || null,
+        password_is_default: user.password_is_default
       }
     });
   } catch (err) { next(err); }
