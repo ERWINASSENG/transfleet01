@@ -35,6 +35,10 @@
                   <button class="btn-icon-sm success" title="Terminer" (click)="openComplete(t)">Terminer</button>
                   <button class="btn-icon-sm danger" title="Annuler" (click)="cancelTrip(t)">Annuler</button>
                 }
+                @if (isDriver() && t.status === "planned") {
+                  <button class="btn-icon-sm success" title="Accepter" (click)="acceptTrip(t)">Accepter</button>
+                  <button class="btn-icon-sm danger" title="Refuser" (click)="declineTrip(t)">Refuser</button>
+                }
               </td>
             </tr>
           } @empty {

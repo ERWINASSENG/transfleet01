@@ -93,6 +93,12 @@ export class ApiService {
   cancelTrip(id: number, reason?: string): Observable<Trip> {
     return this.http.post<Trip>(`${this.base}/trips/${id}/cancel`, { reason });
   }
+  acceptTrip(id: number): Observable<Trip> {
+    return this.http.post<Trip>(`${this.base}/trips/${id}/accept`, {});
+  }
+  declineTrip(id: number, reason: string): Observable<Trip> {
+    return this.http.post<Trip>(`${this.base}/trips/${id}/decline`, { reason });
+  }
 
   // ── Fuel ────────────────────────────────────────────────────────────────────
   getFuel(q: Record<string, any> = {}): Observable<PagedResponse<FuelRecord>> {

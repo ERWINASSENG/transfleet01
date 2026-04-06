@@ -50,6 +50,8 @@ router.delete('/trips/:id', ...any, trip.remove);
 router.post('/trips/:id/start', ...any, trip.start);
 router.post('/trips/:id/complete', ...any, trip.complete);
 router.post('/trips/:id/cancel', ...any, trip.cancel);
+router.post('/trips/:id/accept', ...any, trip.accept);
+router.post('/trips/:id/decline', ...any, trip.decline);
 
 // --- TRACKING (Lecture seule pour éviter les crashs) ---
 router.get('/tracking', ...any, track.latest);

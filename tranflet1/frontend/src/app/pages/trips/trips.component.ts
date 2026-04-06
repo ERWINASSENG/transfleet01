@@ -14,6 +14,7 @@ export class TripsComponent implements OnInit {
   private api  = inject(ApiService);
   auth = inject(AuthService);
   isManager = this.auth.isManager;
+  isDriver = this.auth.isDriver;
 
   trips = signal<Trip[]>([]); total = signal(0);
   loading = signal(false); showModal = signal(false); showComplete = signal(false); saving = signal(false);
@@ -28,7 +29,21 @@ export class TripsComponent implements OnInit {
     this.loading.set(true);
     const q: Record<string,any> = { limit: 100 };
     if (this.filterStatus) q['status'] = this.filterStatus;
-    this.api.getTrips(q).subscribe({ next: r => { this.trips.set(r.data); this.total.set(r.total); this.loading.set(false); }, error: () => this.loading.set(false) });
+    
+    this.api.getTrips(q).subscribe({ 
+      next: r => { 
+        // Filtrer les trajets pour le chauffeur (ne voir que ses propres trajets)
+        const currentUser = this.auth.currentUser();
+        let filteredData = r.data;
+        if (this.isDriver() && currentUser?.driverId) {
+          filteredData = r.data.filter((t: Trip) => t.driver_id === currentUser.driverId);
+        }
+        this.trips.set(filteredData); 
+        this.total.set(filteredData.length); 
+        this.loading.set(false); 
+      }, 
+      error: () => this.loading.set(false) 
+    });
   }
   openModal(): void {
     this.form = this.emptyForm(); this.formError.set(''); this.showModal.set(true);
@@ -76,6 +91,22 @@ export class TripsComponent implements OnInit {
   deleteTrip(t: Trip): void {
     if (confirm(`Supprimer le trajet ${t.from_location} → ${t.to_location} ?`)) {
       this.api.deleteTrip(t.id).subscribe({ next: () => this.load(), error: (e:any) => alert(e?.error?.message || 'Erreur') });
+    }
+  }
+
+  acceptTrip(t: Trip): void {
+    if (confirm(`Accepter le trajet ${t.from_location} → ${t.to_location} ?`)) {
+      this.api.acceptTrip(t.id).subscribe({ next: () => this.load(), error: (e:any) => alert(e?.error?.message || 'Erreur') });
+    }
+  }
+
+  declineTrip(t: Trip): void {
+    const reason = prompt("Motif du refus :");
+    if (reason !== null) {
+      this.api.declineTrip(t.id, reason || 'Aucun motif').subscribe({ 
+        next: () => this.load(), 
+        error: (e:any) => alert(e?.error?.message || 'Erreur') 
+      });
     }
   }
 
