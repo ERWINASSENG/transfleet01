@@ -1,47 +1,34 @@
 import { Injectable, inject } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
-import { AuthService } from './auth.service';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebSocketService {
-  private socket: Socket | null = null;
-  private authService = inject(AuthService);
+  private intervalId: any = null;
+  private listeners: Map<string, ((data: any) => void)[]> = new Map();
 
   connect(): void {
-    const user = this.authService.currentUser();
-    if (!user) return;
-
-    // Remove /api suffix for WebSocket connection
-    const baseUrl = (environment.apiUrl || 'http://localhost:5000').replace('/api', '');
-    this.socket = io(baseUrl, {
-      transports: ['websocket'],
-      withCredentials: true
-    });
-
-    this.socket.on('connect', () => {
-      console.log('🔌 WebSocket connecté');
-      // Authentifier l'utilisateur
-      this.socket?.emit('authenticate', user.id);
-    });
-
-    this.socket.on('disconnect', () => {
-      console.log('🔌 WebSocket déconnecté');
-    });
+    // Polling toutes les 3 secondes pour simuler le temps réel
+    this.intervalId = setInterval(() => {
+      this.listeners.get('new_notification')?.forEach(cb => cb({}));
+    }, 3000);
   }
 
   disconnect(): void {
-    this.socket?.disconnect();
-    this.socket = null;
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
   }
 
   on(event: string, callback: (data: any) => void): void {
-    this.socket?.on(event, callback);
+    if (!this.listeners.has(event)) {
+      this.listeners.set(event, []);
+    }
+    this.listeners.get(event)?.push(callback);
   }
 
   off(event: string): void {
-    this.socket?.off(event);
+    this.listeners.delete(event);
   }
 }

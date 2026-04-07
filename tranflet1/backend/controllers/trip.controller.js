@@ -156,6 +156,8 @@ exports.accept = async (req, res, next) => {
         message: `${driverName} a accepté le trajet ${trip.from_location} → ${trip.to_location}`,
         trip_id: trip.id
       });
+      // Émettre aussi new_notification pour le badge
+      notifyUser(trip.created_by, 'new_notification', {});
     }
     
     const updated = await Trip.findByPk(trip.id, { include: tripIncludes });
@@ -197,6 +199,8 @@ exports.decline = async (req, res, next) => {
         trip_id: trip.id,
         reason: reason
       });
+      // Émettre aussi new_notification pour le badge
+      notifyUser(trip.created_by, 'new_notification', {});
     }
     
     const updated = await Trip.findByPk(trip.id, { include: tripIncludes });
