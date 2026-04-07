@@ -24,8 +24,8 @@
               <td>{{ f.price_per_litre.toLocaleString() }}</td>
               <td><strong>{{ f.total_cost.toLocaleString() }}</strong></td>
               <td class="actions">
-                <button class="btn-icon-sm" (click)="openModal(f)">Modifier</button>
-                <button class="btn-icon-sm danger" (click)="del(f)">Supprimer</button>
+                <button class="btn btn-secondary btn-sm" (click)="openModal(f)">Modifier</button>
+                <button class="btn btn-danger btn-sm" (click)="del(f)">Supprimer</button>
               </td>
             </tr>
           } @empty { <tr><td colspan="8" class="empty">Aucun enregistrement.</td></tr> }

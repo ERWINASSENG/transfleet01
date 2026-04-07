@@ -25,10 +25,10 @@
         </div>
         <div class="notif-actions">
           @if (!n.is_read) {
-            <button class="btn-icon-sm success" title="Marquer lu" (click)="markOne(n)">Lu</button>
+            <button class="btn btn-success btn-sm" title="Marquer lu" (click)="markOne(n)">Lu</button>
           }
           @if (isManager()) {
-            <button class="btn-icon-sm danger" title="Supprimer" (click)="del(n)">Suppr</button>
+            <button class="btn btn-danger btn-sm" title="Supprimer" (click)="del(n)">Suppr</button>
           }
         </div>
       </div>

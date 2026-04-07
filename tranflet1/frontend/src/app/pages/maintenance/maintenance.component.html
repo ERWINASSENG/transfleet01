@@ -25,8 +25,8 @@
               <td>{{ m.estimated_cost ? m.estimated_cost.toLocaleString() + " F" : "—" }}</td>
               <td>{{ m.provider ?? "—" }}</td>
               <td class="actions">
-                <button class="btn-icon-sm" (click)="openModal(m)">Modifier</button>
-                <button class="btn-icon-sm danger" (click)="del(m)">Supprimer</button>
+                <button class="btn btn-secondary btn-sm" (click)="openModal(m)">Modifier</button>
+                <button class="btn btn-danger btn-sm" (click)="del(m)">Supprimer</button>
               </td>
             </tr>
           } @empty { <tr><td colspan="8" class="empty">Aucune maintenance.</td></tr> }

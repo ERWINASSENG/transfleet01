@@ -30,9 +30,9 @@
               <td>{{ d.total_trips }}</td>
               <td><span class="badge" [class]="'badge-' + d.status">{{ statusLabel(d.status) }}</span></td>
               <td class="actions">
-                <button class="btn-icon-sm" (click)="openModal(d)">Modifier</button>
-                <button class="btn-icon-sm" (click)="resetPassword(d)" title="Réinitialiser le mot de passe">Reset MDP</button>
-                <button class="btn-icon-sm danger" (click)="confirmDelete(d)">Supprimer</button>
+                <button class="btn btn-secondary btn-sm" (click)="openModal(d)">Modifier</button>
+                <button class="btn btn-secondary btn-sm" (click)="resetPassword(d)" title="Réinitialiser le mot de passe">Reset MDP</button>
+                <button class="btn btn-danger btn-sm" (click)="confirmDelete(d)">Supprimer</button>
               </td>
             </tr>
           } @empty {

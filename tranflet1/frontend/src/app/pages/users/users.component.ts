@@ -44,8 +44,8 @@ import { ApiService } from '../../core/services/api.service';
                   <td>{{ roleLabel(u.role) }}</td>
                   <td><span class="badge" [class.active]="u.is_active" [class.inactive]="!u.is_active">{{ u.is_active ? 'Actif' : 'Inactif' }}</span></td>
                   <td class="actions">
-                    <button class="btn-icon-sm" (click)="toggleActive(u)">{{ u.is_active ? 'Désactiver' : 'Activer' }}</button>
-                    <button class="btn-icon-sm danger" (click)="deleteUser(u)">Supprimer</button>
+                    <button class="btn btn-secondary btn-sm" (click)="toggleActive(u)">{{ u.is_active ? 'Désactiver' : 'Activer' }}</button>
+                    <button class="btn btn-danger btn-sm" (click)="deleteUser(u)">Supprimer</button>
                   </td>
                 </tr>
               } @empty {

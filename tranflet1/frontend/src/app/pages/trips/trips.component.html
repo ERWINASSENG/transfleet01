@@ -27,17 +27,17 @@
               <td><span class="badge" [class]="'badge-' + t.status">{{ statusLabel(t.status) }}</span></td>
               <td class="actions">
                 @if (isManager() && t.status === "planned") {
-                  <button class="btn-icon-sm success" title="Démarrer" (click)="startTrip(t)">Demarrer</button>
-                  <button class="btn-icon-sm" title="Modifier" (click)="editTrip(t)">Modifier</button>
-                  <button class="btn-icon-sm danger" title="Supprimer" (click)="deleteTrip(t)">Supprimer</button>
+                  <button class="btn btn-success btn-sm" title="Démarrer" (click)="startTrip(t)">Demarrer</button>
+                  <button class="btn btn-secondary btn-sm" title="Modifier" (click)="editTrip(t)">Modifier</button>
+                  <button class="btn btn-danger btn-sm" title="Supprimer" (click)="deleteTrip(t)">Supprimer</button>
                 }
                 @if (isManager() && t.status === "in_progress") {
-                  <button class="btn-icon-sm success" title="Terminer" (click)="openComplete(t)">Terminer</button>
-                  <button class="btn-icon-sm danger" title="Annuler" (click)="cancelTrip(t)">Annuler</button>
+                  <button class="btn btn-success btn-sm" title="Terminer" (click)="openComplete(t)">Terminer</button>
+                  <button class="btn btn-danger btn-sm" title="Annuler" (click)="cancelTrip(t)">Annuler</button>
                 }
                 @if (isDriver() && t.status === "planned") {
-                  <button class="btn-icon-sm success" title="Accepter" (click)="acceptTrip(t)">Accepter</button>
-                  <button class="btn-icon-sm danger" title="Refuser" (click)="declineTrip(t)">Refuser</button>
+                  <button class="btn btn-success btn-sm" title="Accepter" (click)="acceptTrip(t)">Accepter</button>
+                  <button class="btn btn-danger btn-sm" title="Refuser" (click)="declineTrip(t)">Refuser</button>
                 }
               </td>
             </tr>

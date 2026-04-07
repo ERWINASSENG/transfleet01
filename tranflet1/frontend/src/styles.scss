@@ -13,6 +13,8 @@ html, body { margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Se
 .btn-secondary{background:#f1f5f9;color:#374151;}
 .btn-danger{background:#ef4444;color:#fff;}
 .btn-success{background:#22c55e;color:#fff;}
+.btn-block{width:100%;justify-content:center;}
+.btn-sm{padding:6px 12px;font-size:.8rem;}
 .btn-icon-sm{height:30px;border:none;background:transparent;border-radius:6px;cursor:pointer;font-size:.85rem;display:inline-flex;align-items:center;justify-content:center;transition:background .15s;padding:0 10px;white-space:nowrap;}
 .btn-icon-sm:hover{background:#f1f5f9;}.btn-icon-sm.danger:hover{background:#fee2e2;}.btn-icon-sm.success:hover{background:#dcfce7;}
 .filters{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}

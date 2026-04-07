@@ -41,8 +41,8 @@
               <td><span class="badge" [class]="'badge-' + v.status">{{ statusLabel(v.status) }}</span></td>
               <td>{{ v.assignedDriver?.user ? v.assignedDriver!.user!.first_name + ' ' + v.assignedDriver!.user!.last_name : '—' }}</td>
               <td class="actions">
-                <button class="btn-icon-sm" title="Modifier" (click)="openModal(v)">Modifier</button>
-                <button class="btn-icon-sm danger" title="Supprimer" (click)="confirmDelete(v)">Supprimer</button>
+                <button class="btn btn-secondary btn-sm" title="Modifier" (click)="openModal(v)">Modifier</button>
+                <button class="btn btn-danger btn-sm" title="Supprimer" (click)="confirmDelete(v)">Supprimer</button>
               </td>
             </tr>
           } @empty {
