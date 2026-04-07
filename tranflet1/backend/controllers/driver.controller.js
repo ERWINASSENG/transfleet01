@@ -42,7 +42,15 @@ exports.create = async (req, res, next) => {
     const existing = await User.findOne({ where: { email } });
     if (existing) return res.status(409).json({ message: 'Email déjà utilisé' });
     const hash = await bcrypt.hash(password || 'Transflet2024!', 10);
-    const user = await User.create({ first_name, last_name, email, phone, password_hash: hash, role: 'driver' });
+    const user = await User.create({
+      first_name: first_name.trim(),
+      last_name: last_name.trim(),
+      email: email.toLowerCase().trim(),
+      phone: phone?.trim() || null,
+      password_hash: hash,
+      role: 'driver',
+      password_is_default: !password // true si mot de passe par défaut, false si fourni
+    });
     const driver = await Driver.create({ ...driverData, user_id: user.id });
     const full = await Driver.findByPk(driver.id, { include: driverIncludes });
     res.status(201).json(full);
@@ -67,7 +75,17 @@ exports.remove = async (req, res, next) => {
     if (!d) return res.status(404).json({ message: 'Conducteur introuvable' });
     const active = await Trip.count({ where: { driver_id: d.id, status: 'in_progress' } });
     if (active) return res.status(409).json({ message: 'Conducteur en trajet actif' });
+    
+    // Supprimer d'abord le driver, puis l'utilisateur associé
+    const userId = d.user_id;
     await d.destroy();
+    
+    // Supprimer l'utilisateur associé s'il existe
+    if (userId) {
+      const { User } = require('../models');
+      await User.destroy({ where: { id: userId } });
+    }
+    
     res.status(204).send();
   } catch (err) { next(err); }
 };

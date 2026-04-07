@@ -1,5 +1,5 @@
 'use strict';
-const { Trip, Vehicle, Driver, User, TrackingPoint, Notification } = require('../models');
+const { Trip, Driver, Vehicle, User, Notification } = require('../models');
 const { notifyUser } = require('../utils/socket');
 
 // Positions de démo à Douala
@@ -135,26 +135,28 @@ exports.accept = async (req, res, next) => {
     
     await trip.update({ status: 'in_progress', actual_start: new Date() });
     
-    // Notifier le manager que le chauffeur a accepté
-    const driver = await Driver.findByPk(trip.driver_id, { include: [{ model: User, as: 'user' }] });
-    const driverName = driver?.user ? `${driver.user.first_name} ${driver.user.last_name}` : 'Le chauffeur';
-    
-    await Notification.create({
-      sender_id: req.user?.id,
-      recipient_id: trip.created_by,
-      type: 'success',
-      title: 'Trajet accepté',
-      message: `${driverName} a accepté le trajet ${trip.from_location} → ${trip.to_location}`,
-      target_role: 'manager',
-      action_url: `/trips`
-    });
-    
-    // Notification en temps réel via WebSocket
-    notifyUser(trip.created_by, 'trip_accepted', {
-      title: 'Trajet accepté',
-      message: `${driverName} a accepté le trajet ${trip.from_location} → ${trip.to_location}`,
-      trip_id: trip.id
-    });
+    // Notifier le manager que le chauffeur a accepté (seulement si created_by existe)
+    if (trip.created_by) {
+      const driver = await Driver.findByPk(trip.driver_id, { include: [{ model: User, as: 'user' }] });
+      const driverName = driver?.user ? `${driver.user.first_name} ${driver.user.last_name}` : 'Le chauffeur';
+      
+      await Notification.create({
+        sender_id: req.user?.id || null,
+        recipient_id: trip.created_by,
+        type: 'success',
+        title: 'Trajet accepté',
+        message: `${driverName} a accepté le trajet ${trip.from_location} → ${trip.to_location}`,
+        target_role: 'manager',
+        action_url: `/trips`
+      });
+      
+      // Notification en temps réel via WebSocket
+      notifyUser(trip.created_by, 'trip_accepted', {
+        title: 'Trajet accepté',
+        message: `${driverName} a accepté le trajet ${trip.from_location} → ${trip.to_location}`,
+        trip_id: trip.id
+      });
+    }
     
     const updated = await Trip.findByPk(trip.id, { include: tripIncludes });
     res.json({ message: "Trajet accepté", trip: updated });
@@ -173,27 +175,29 @@ exports.decline = async (req, res, next) => {
     const reason = req.body.reason || 'Aucune raison fournie';
     await trip.update({ status: 'cancelled', notes: `Refusé par le chauffeur: ${reason}` });
     
-    // Notifier le manager que le chauffeur a refusé
-    const driver = await Driver.findByPk(trip.driver_id, { include: [{ model: User, as: 'user' }] });
-    const driverName = driver?.user ? `${driver.user.first_name} ${driver.user.last_name}` : 'Le chauffeur';
-    
-    await Notification.create({
-      sender_id: req.user?.id,
-      recipient_id: trip.created_by,
-      type: 'warning',
-      title: 'Trajet refusé',
-      message: `${driverName} a refusé le trajet ${trip.from_location} → ${trip.to_location}. Raison: ${reason}`,
-      target_role: 'manager',
-      action_url: `/trips`
-    });
-    
-    // Notification en temps réel via WebSocket
-    notifyUser(trip.created_by, 'trip_declined', {
-      title: 'Trajet refusé',
-      message: `${driverName} a refusé le trajet ${trip.from_location} → ${trip.to_location}. Raison: ${reason}`,
-      trip_id: trip.id,
-      reason: reason
-    });
+    // Notifier le manager que le chauffeur a refusé (seulement si created_by existe)
+    if (trip.created_by) {
+      const driver = await Driver.findByPk(trip.driver_id, { include: [{ model: User, as: 'user' }] });
+      const driverName = driver?.user ? `${driver.user.first_name} ${driver.user.last_name}` : 'Le chauffeur';
+      
+      await Notification.create({
+        sender_id: req.user?.id || null,
+        recipient_id: trip.created_by,
+        type: 'warning',
+        title: 'Trajet refusé',
+        message: `${driverName} a refusé le trajet ${trip.from_location} → ${trip.to_location}. Raison: ${reason}`,
+        target_role: 'manager',
+        action_url: `/trips`
+      });
+      
+      // Notification en temps réel via WebSocket
+      notifyUser(trip.created_by, 'trip_declined', {
+        title: 'Trajet refusé',
+        message: `${driverName} a refusé le trajet ${trip.from_location} → ${trip.to_location}. Raison: ${reason}`,
+        trip_id: trip.id,
+        reason: reason
+      });
+    }
     
     const updated = await Trip.findByPk(trip.id, { include: tripIncludes });
     res.json({ message: "Trajet refusé", trip: updated });

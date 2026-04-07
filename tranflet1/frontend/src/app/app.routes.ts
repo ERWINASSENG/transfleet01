@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard, managerGuard, driverRedirectGuard } from './core/guards/auth.guard';
+import { authGuard, guestGuard, driverRedirectGuard, managerGuard, forcePasswordChangeGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', canActivate: [guestGuard], loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent) },
-  { path: 'force-password-change', canActivate: [authGuard], loadComponent: () => import('./pages/force-password-change/force-password-change.component').then(m => m.ForcePasswordChangeComponent) },
+  { path: 'force-password-change', canActivate: [forcePasswordChangeGuard], loadComponent: () => import('./pages/force-password-change/force-password-change.component').then(m => m.ForcePasswordChangeComponent) },
   {
     path: '',
     canActivate: [authGuard],

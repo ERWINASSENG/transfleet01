@@ -32,6 +32,15 @@ export const driverRedirectGuard: CanActivateFn = () => {
   return true;
 };
 
+export const forcePasswordChangeGuard: CanActivateFn = () => {
+  const auth   = inject(AuthService);
+  const router = inject(Router);
+  // Seuls les utilisateurs connectés peuvent accéder à cette page
+  if (!auth.isLoggedIn()) return router.createUrlTree(['/login']);
+  // Ne pas rediriger si déjà sur force-password-change
+  return true;
+};
+
 export const managerGuard: CanActivateFn = () => {
   const auth   = inject(AuthService);
   const router = inject(Router);

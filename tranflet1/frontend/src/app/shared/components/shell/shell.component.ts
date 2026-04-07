@@ -1,8 +1,9 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
+import { WebSocketService } from '../../../core/services/websocket.service';
 
 interface NavItem { label: string; route: string; managerOnly?: boolean }
 
@@ -13,9 +14,10 @@ interface NavItem { label: string; route: string; managerOnly?: boolean }
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
 })
-export class ShellComponent implements OnInit {
+export class ShellComponent implements OnInit, OnDestroy {
   auth = inject(AuthService);
   api  = inject(ApiService);
+  ws   = inject(WebSocketService);
 
   sidebarOpen  = signal(true);
   userMenuOpen = signal(false);
@@ -48,6 +50,18 @@ export class ShellComponent implements OnInit {
   ngOnInit(): void {
     this.refreshUnread();
     setInterval(() => this.refreshUnread(), 60_000);
+    
+    // Connexion WebSocket pour notifications en temps réel
+    if (this.auth.isLoggedIn()) {
+      this.ws.connect();
+      this.ws.on('new_notification', () => {
+        this.refreshUnread();
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.ws.disconnect();
   }
 
   private refreshUnread(): void {

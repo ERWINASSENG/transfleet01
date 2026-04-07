@@ -11,12 +11,14 @@ const driver = require('../controllers/driver.controller');
 const fuel = require('../controllers/fuel.controller');
 const maintenance = require('../controllers/maintenance.controller');
 const report = require('../controllers/report.controller'); 
-const notification = require('../controllers/notification.controller'); 
+const notification = require('../controllers/notification.controller');
+const user = require('../controllers/user.controller'); 
 
 const any = [authenticate];
 
 // --- AUTHENTIFICATION ---
 router.post('/auth/login', auth.login);
+router.put('/auth/password', authenticate, auth.changePassword);
 
 // --- DASHBOARD (Rétabli pour Aminata Diallo) ---
 router.get('/reports/dashboard', ...any, report.dashboard);
@@ -64,6 +66,13 @@ router.get('/maintenance/:id', ...any, maintenance.get);
 router.put('/maintenance/:id', ...any, maintenance.update);
 router.delete('/maintenance/:id', ...any, maintenance.remove);
 router.get('/maintenance/upcoming', ...any, maintenance.upcoming);
+
+// --- UTILISATEURS ---
+router.get('/users', ...any, user.list);
+router.post('/users/manager', ...any, user.createManager);
+router.post('/users/driver', ...any, user.createDriver);
+router.delete('/users/:id', ...any, user.remove);
+router.post('/users/:id/reset-password', ...any, user.resetPassword);
 
 // --- NOTIFICATIONS ---
 router.get('/notifications', ...any, notification.list);

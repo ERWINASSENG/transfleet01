@@ -52,7 +52,8 @@ exports.createManager = async (req, res, next) => {
       phone: phone?.trim() || null,
       password_hash,
       role: 'manager',
-      is_active: true
+      is_active: true,
+      password_is_default: false // Manager créé avec mot de passe personnalisé
     });
 
     res.status(201).json({
@@ -102,7 +103,8 @@ exports.createDriver = async (req, res, next) => {
       phone: phone?.trim() || null,
       password_hash,
       role: 'driver',
-      is_active: true
+      is_active: true,
+      password_is_default: false // Chauffeur créé avec mot de passe personnalisé
     });
 
     // Créer le profil driver associé
@@ -187,6 +189,21 @@ exports.remove = async (req, res, next) => {
     // Empêcher de supprimer un admin
     if (user.role === 'admin') {
       return res.status(403).json({ message: 'Impossible de supprimer un administrateur' });
+    }
+
+    // Si c'est un chauffeur, supprimer d'abord le driver associé
+    if (user.role === 'driver') {
+      const { Driver } = require('../models');
+      const driver = await Driver.findOne({ where: { user_id: user.id } });
+      if (driver) {
+        // Vérifier s'il a des trajets en cours
+        const { Trip } = require('../models');
+        const active = await Trip.count({ where: { driver_id: driver.id, status: 'in_progress' } });
+        if (active) {
+          return res.status(409).json({ message: 'Le chauffeur a des trajets en cours' });
+        }
+        await driver.destroy();
+      }
     }
 
     await user.destroy();

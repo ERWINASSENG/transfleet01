@@ -46,3 +46,36 @@ exports.login = async (req, res, next) => {
     });
   } catch (err) { next(err); }
 };
+
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { current_password, new_password } = req.body;
+    const userId = req.user.id;
+
+    // Vérifier que l'utilisateur existe
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    // Vérifier le mot de passe actuel
+    const valid = await bcrypt.compare(current_password, user.password_hash);
+    if (!valid) {
+      return res.status(401).json({ message: 'Mot de passe actuel incorrect' });
+    }
+
+    // Hasher le nouveau mot de passe
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(new_password, saltRounds);
+
+    // Mettre à jour le mot de passe
+    await user.update({
+      password_hash: hashedPassword,
+      password_is_default: false
+    });
+
+    res.json({ message: 'Mot de passe changé avec succès' });
+  } catch (err) {
+    next(err);
+  }
+};
